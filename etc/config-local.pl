@@ -7,13 +7,13 @@
 # getting clobbered when you upgrade to the newest Dreamwidth code in
 # the future.
 
-# This, and config-private.pl should be the only files you need to 
+# This, and config-private.pl should be the only files you need to
 # change to get the Dreamwidth code to run on your site. Variables
-# which are set by $DW::PRIVATE::... should be configured in 
+# which are set by $DW::PRIVATE::... should be configured in
 # config-private.pl instead.
 
-# Use the  checkconfig.pl utility to find any other config variables 
-# that might not be documented here. You should be able to set config 
+# Use the  checkconfig.pl utility to find any other config variables
+# that might not be documented here. You should be able to set config
 # values here and have the DW code run; if you have to modify the
 # code itself, it's a bug and you should report it.
 
@@ -21,9 +21,12 @@
     package LJ;
 
     # keep this enabled only if this site is a development server
-    $IS_DEV_SERVER = 1;
+    $IS_DEV_SERVER = 0;
     $ENABLE_BETA_TOOLS = 1;
 
+    @LANGS = qw( en_DW, lv );
+    $DEFAULT_LANG = 'lv';   # not documented, I should mention this flag in wiki!
+                            # when I'll have time...
     # home directory
     $HOME = $ENV{'LJHOME'};
 

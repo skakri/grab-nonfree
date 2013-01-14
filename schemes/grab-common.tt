@@ -1,0 +1,267 @@
+[%#
+Base Grab! template
+
+ Authors:
+    Kristaps Karlsons <kristaps.karlsons@gmail.com>
+
+%]
+[%- BLOCK block.need_res -%]
+    [%- dw_scheme.need_res(
+            'stc/reset.css',
+            'stc/jquery/jquery.ui.theme.smoothness.css',
+            'stc/lj_base-app.css',
+            'stc/grab/fontawesome/css/font-awesome.min.css',
+            'stc/grab/grab-base.css'
+        );
+        dw_scheme.need_res({ group => 'jquery' }, 'js/nav-jquery.js' );
+        dw_scheme.need_res({ group => 'default' }, 'js/nav.js' ); -%]
+[%- END -%]
+[%- userpic_class = 'account-links-userpic' -%]
+[%- BLOCK block.userpic -%]
+<div id='[% userpic_class %]'><a href='[% site.root %]/editicons'>
+    [%- IF remote -%][%- userpic = remote.userpic -%]
+        [%- IF userpic && ! is_ssl -%]
+            <img src='[% userpic.url %]' [% userpic.img_fixedsize( 'width', 40, 'height', 40 ) %] alt='[% 'sitescheme.accountlinks.userpic.alt' | ml %]' />
+        [%- ELSE -%]
+            <img src='/img/nouserpic.png' width="40" height="40" alt='[% 'sitescheme.accountlinks.userpic.alt' | ml %]' />
+        [%- END -%]
+    [%- END -%]
+</a></div>
+[%- END -%]
+[%- account_link_options = {} -%]
+[%- BLOCK block.accountlinks -%]
+[%- IF remote -%]
+    [%- IF ! account_link_options.no_userpic -%]
+        [%- PROCESS block.userpic -%]
+    [%- END -%]
+    [%- inbox = remote.notification_inbox -%]
+    [%- unread = inbox.unread_count -%]
+    [%- identity = remote.is_identity -%]
+    [%- -%]<div id='account-links-text'>
+    [%- IF dw_scheme.show_logout_button -%]
+    [%- -%]<form action='[% is_ssl ? site.ssl.root : site.root %]/logout?ret=1' method='post'>
+    [%- remote.ljuser_display -%]
+    [%- -%]<input type='hidden' name='user' value='[% remote.user %]' />
+    [%- -%]<input type='hidden' name='sessid' value='[% remote.session.sessid %]' />
+    [%- -%]<input type='submit' value="[% 'sitescheme.accountlinks.btn.logout' | ml %]" />
+    [%- -%]</form>
+    [%- END -%]
+    [%- -%]<ul>
+    [%- IF ! identity -%]<li><a href='[% site.root %]/update' title="[% 'sitescheme.accountlinks.post' | ml %]"><i class="icon-pencil"></i></a></li>[%- END -%]
+    [%- -%]<li><a href='[% remote.journal_base %]/read' title="[% 'sitescheme.accountlinks.readinglist' | ml %]"><i class="icon-book"></i></a></li>
+    [%- -%]<li><a href='[% site.root %]/inbox/' title="[% 'sitescheme.accountlinks.inbox' | ml %]"><i class="icon-envelope-alt"></i>
+    [%- IF unread -%] <span id='Inbox_Unread_Count'>([% unread %])</span>[%- END -%]
+    [%- -%]</a></li>
+    [%- -%]<li><a href='[% site.root %]/manage/settings/' title="[% 'sitescheme.accountlinks.account' | ml %]"><i class="icon-wrench"></i></a></li>
+    [%- IF ! identity AND dw_scheme.show_invite_link -%]<li><a href='[% site.root %]/manage/circle/invite' title="[% 'sitescheme.accountlinks.invitefriend' | ml %]" class="red"><i class="icon-heart"></i></a></li>[%- END -%]
+    [%- -%]<li><a href='[% site.root %]/support/' title="[% 'sitescheme.accountlinks.help' | ml %]"><i class="icon-question-sign"></i></a></li>
+    [%- -%]</div>
+[%- ELSE -%]
+    [%- chal = dw_scheme.challenge_generate(300) -%]
+    [%- -%]<form action='[% is_ssl ? site.ssl.root : site.root %]/login?ret=1' method='post' class='lj_login_form'>
+    [%- -%]<input type="hidden" name="returnto" value="[% get.returnto | html %]" />
+    [%- -%]<input type='hidden' name='chal' class='lj_login_chal' value='[% chal %]' />
+    <input type='hidden' name='response' class='lj_login_response' value='' />
+    <table summary='' id='login-table'>
+    [%- -%]<tr><td><label for='login_user'>[% 'sitescheme.accountlinks.login.username' | ml %]</label></td>
+    [%- -%]<td class='input-cell' colspan='2'><input name="user" id="login_user" size="20" maxlength="27" tabindex="1" aria-required="true" />
+    [%- %] <a href='[% is_ssl ? site.ssl.root : site.root %]/openid/[% IF get.returnto %]?returnto=[% get.returnto | html %][% END %]' tabindex=5>[% 'sitescheme.accountlinks.login.openid' | ml %]</a></td></tr>
+    [%- -%]<tr><td><label for='login_password'>[% 'sitescheme.accountlinks.login.password' | ml %]</label></td>
+    [%- -%]<td class='input-cell' colspan='2'><input type="password" name="password" id="login_password" size="20" tabindex="2" aria-required="true" class="lj_login_password">
+    [%- %] <a href='[% is_ssl ? site.ssl.root : site.root %]/lostinfo' tabindex=6>[% 'sitescheme.accountlinks.login.forgotpassword' | ml %]</a></td></tr>
+    [%- -%]<tr><td>&nbsp;</td>
+    [%- -%]<td class='remember-me-cell'>
+    [%- -%]<input type="checkbox" name="remember_me" id="login_remember_me" value="1" tabindex="3" />
+    [%- %] <label for='login_remember_me'>[% 'sitescheme.accountlinks.login.rememberme' | ml %]</label></td>
+    [%- -%]<td><input type="submit" name="login" value="[% 'sitescheme.accountlinks.btn.login' | ml %]" tabindex="4"/></td>
+    [%- -%]</tr></table></form>
+[%- END -%]
+[%- END -%]
+[%# Override menu to use Font Awesome icons %]
+[%- BLOCK block.menunav -%]
+<ul>[%- nav_links = dw_scheme.menu_nav -%]
+[% FOREACH cathash IN nav_links -%]
+    [%- cat = cathash.name -%][%- submenu = cathash.items -%]
+    [%- displayed = [] -%]
+    [%- FOREACH item IN submenu -%]
+        [%- IF item.display -%]
+            [%- v = BLOCK -%]
+                [%- icon = '' -%]
+                [%- important = '' -%]
+                [%- IF item.text=='menunav.create.updatejournal' -%]
+                    [%- icon = '<i class="icon-pencil"></i>' -%]
+                    [%- important = 'important' -%]
+                [%- END -%]
+                [%- IF item.text=='menunav.create.editjournal' -%]
+                    [%- icon = '<i class="icon-edit"></i>' -%]
+                [%- END -%]
+                [%- IF item.text=='menunav.create.editprofile' -%]
+                    [%- icon = '<i class="icon-user"></i>' -%]
+                [%- END -%]
+                [%- IF item.text=='menunav.create.createaccount' -%]
+                    [%- icon = '<i class="icon-user"></i>' -%]
+                    [%- important = 'important' -%]
+                [%- END -%]
+                [%- IF item.text=='menunav.create.displayprefs' -%]
+                    [%- icon = '<i class="icon-cogs"></i>' -%]
+                [%- END -%]
+                [%- IF item.text=='menunav.create.uploaduserpics' -%]
+                    [%- icon = '<i class="icon-picture"></i>' -%]
+                [%- END -%]
+                [%- IF item.text=='menunav.create.createcommunity' -%]
+                    [%- icon = '<i class="icon-group"></i>' -%]
+                [%- END -%]
+
+                [%- IF item.text=='menunav.organize.manageaccount' -%]
+                    [%- icon = '<i class="icon-wrench"></i>' -%]
+                [%- END -%]
+                [%- IF item.text=='menunav.organize.managerelationships' -%]
+                    [%- icon = '<i class="icon-heart"></i>' -%]
+                [%- END -%]
+                [%- IF item.text=='menunav.organize.managefilters' -%]
+                    [%- icon = '<i class="icon-filter"></i>' -%]
+                [%- END -%]
+                [%- IF item.text=='menunav.organize.managetags' -%]
+                    [%- icon = '<i class="icon-tags"></i>' -%]
+                [%- END -%]
+                [%- IF item.text=='menunav.organize.managecommunities' -%]
+                    [%- icon = '<i class="icon-group"></i>' -%]
+                [%- END -%]
+                [%- IF item.text=='menunav.organize.importcontent' -%]
+                    [%- icon = '<i class="icon-cloud-upload"></i>' -%]
+                [%- END -%]
+                [%- IF item.text=='menunav.organize.selectstyle' -%]
+                    [%- icon = '<i class="icon-magic"></i>' -%]
+                    [%- important = 'important' -%]
+                [%- END -%]
+                [%- IF item.text=='menunav.organize.customizestyle' -%]
+                    [%- icon = '<i class="icon-tint"></i>' -%]
+                [%- END -%]
+
+                [%- IF item.text=='menunav.read.readinglist' -%]
+                    [%- icon = '<i class="icon-book"></i>' -%]
+                    [%- important = 'important' -%]
+                [%- END -%]
+                [%- IF item.text=='menunav.read.profile' -%]
+                    [%- icon = '<i class="icon-user"></i>' -%]
+                [%- END -%]
+                [%- IF item.text=='menunav.read.syndicatedfeeds' -%]
+                    [%- icon = '<i class="icon-rss"></i>' -%]
+                [%- END -%]
+                [%- IF item.text=='menunav.read.tags' -%]
+                    [%- icon = '<i class="icon-tags"></i>' -%]
+                [%- END -%]
+                [%- IF item.text=='menunav.read.archive' -%]
+                    [%- icon = '<i class="icon-calendar"></i>' -%]
+                [%- END -%]
+                [%- IF item.text=='menunav.read.recentcomments' -%]
+                    [%- icon = '<i class="icon-comments"></i>' -%]
+                [%- END -%]
+                [%- IF item.text=='menunav.read.inbox.nounread' -%]
+                    [%- icon = '<i class="icon-envelope"></i>' -%]
+                [%- END -%]
+
+                [%- IF item.text=='menunav.explore.interests' -%]
+                    [%- icon = '<i class="icon-heart"></i>' -%]
+                [%- END -%]
+                [%- IF item.text=='menunav.explore.directorysearch' -%]
+                    [%- icon = '<i class="icon-search"></i>' -%]
+                [%- END -%]
+                [%- IF item.text=='menunav.explore.latestthings' -%]
+                    [%- icon = '<i class="icon-globe"></i>' -%]
+                    [%- important = 'important' -%]
+                [%- END -%]
+                [%- IF item.text=='menunav.explore.randomjournal' -%]
+                    [%- icon = '<i class="icon-spinner"></i>' -%]
+                [%- END -%]
+                [%- IF item.text=='menunav.explore.randomcommunity' -%]
+                    [%- icon = '<i class="icon-spinner"></i>' -%]
+                [%- END -%]
+                [%- IF item.text=='menunav.explore.faq' -%]
+                    [%- icon = '<i class="icon-question-sign"></i>' -%]
+                [%- END -%]
+
+                [%- IF item.text=='menunav.shop.paidtime2' -%]
+                    [%- icon = '<i class="icon-shopping-cart"></i>' -%]
+                [%- END -%]
+                [%- IF item.text=='menunav.shop.history' -%]
+                    [%- icon = '<i class="icon-exchange"></i>' -%]
+                [%- END -%]
+                [%- IF item.text=='menunav.shop.gifts' -%]
+                    [%- icon = '<i class="icon-gift"></i>' -%]
+                [%- END -%]
+                [%- IF item.text=='menunav.shop.sponsor' -%]
+                    [%- icon = '<i class="icon-beer"></i>' -%]
+                [%- END -%]
+                [%- IF item.text=='menunav.shop.transferpoints' -%]
+                    [%- icon = '<i class="icon-share-alt"></i>' -%]
+                [%- END -%]
+                <li class='subnav [% important %]'><a href='[% item.url %]'>[% icon %][% item.text | ml(item.text_opts) %]</a></li>
+            [%- END; displayed.push(v) -%]
+        [%- END -%]
+    [%- END -%]
+    [%- IF displayed.size -%]
+<li id='[% cat %]_topnav' class='topnav'><a href='[% site.root %]/nav/[% cat %]'>[% "menunav.$cat" | ml %]</a>
+<ul id='[% cat %]_subnav' class='subnav_container'>
+[% displayed.join("\n") %]
+</ul>
+</li>
+    [%- END -%]
+[%- END %]
+</ul>
+[%- END -%]
+[%- BLOCK block.logo -%]
+<a href="[% site.root %]/">Grab!</a>
+[%- END -%]
+[%- BLOCK block.footer -%]
+<ul>
+    <li><a href="[% site.root %]/legal/privacy">[% 'sitescheme.footer.legal.privacypolicy' | ml %]</a></li>
+    <li><a href="[% site.root %]/legal/tos">[% 'sitescheme.footer.legal.tos' | ml %]</a></li>
+    [%# <li><a href="\[% site.root %\]/legal/diversity">\[% 'sitescheme.footer.legal.diversitystatement' | ml %\]</a></li> %]
+    [%# <li><a href="\[% site.root %\]/legal/principles">\[% 'sitescheme.footer.legal.guidingprinciples' | ml %\]</a></li> %]
+    <li><a href="[% site.root %]/site/">[% 'sitescheme.footer.sitemap' | ml %]</a></li>
+    <li><a href="[% site.root %]/site/suggest">[% 'sitescheme.footer.suggestion' | ml %]</a></li>
+</ul>
+<p>[% 'sitescheme.footer.info' | ml %]</p>
+[%- END -%]
+[%- BLOCK block.page -%]
+<!DOCTYPE html>
+<html lang="lv">
+    [% PROCESS block.head %]
+    <body [% sections.bodyopts %]>
+        <div id="canvas">
+            <div id="page">
+                <div id="masthead" role="navigation" class="cf">
+                    <div class=wrap>
+                        <h1 id="logo">
+                            [% PROCESS block.logo %]
+                        </h1>
+                        <nav role="navigation">
+                            [% PROCESS block.menunav %]
+                        </nav>
+                        <div role="search" id="mast-search">
+                            [% dw_scheme.search_render %]
+                        </div>
+                    </div>
+                </div>
+                <div class="wrap">
+                    <div id="account-links" class="cf" role="navigation">
+                        [% PROCESS block.accountlinks %]
+                    </div>
+                </div>
+                <div id="content" role="main" [% sections.contentopts %]>
+                    <h1>[% sections.title %]</h1>
+                    [% content %]
+                </div>
+                <div class="cf"></div>
+                <footer role="contentinfo">
+                    <div class="wrap">[% PROCESS block.footer %]</div>
+                </footer>
+            </div>
+        </div>
+        [% dw_scheme.final_body_html %]
+
+        <div id="shim-alpha"> </div>
+    </body>
+</html>
+[%- END -%]
