@@ -23,7 +23,7 @@ Base Grab! template
         [%- IF userpic && ! is_ssl -%]
             <img src='[% userpic.url %]' [% userpic.img_fixedsize( 'width', 40, 'height', 40 ) %] alt='[% 'sitescheme.accountlinks.userpic.alt' | ml %]' />
         [%- ELSE -%]
-            <img src='/img/nouserpic.png' width="40" height="40" alt='[% 'sitescheme.accountlinks.userpic.alt' | ml %]' />
+            <img src='//www.grab.lv/img/nouserpic.png' width="40" height="40" alt='[% 'sitescheme.accountlinks.userpic.alt' | ml %]' />
         [%- END -%]
     [%- END -%]
 </a></div>
@@ -53,7 +53,8 @@ Base Grab! template
     [%- IF unread -%] <span id='Inbox_Unread_Count'>([% unread %])</span>[%- END -%]
     [%- -%]</a></li>
     [%- -%]<li><a href='[% site.root %]/manage/settings/' title="[% 'sitescheme.accountlinks.account' | ml %]"><i class="icon-wrench"></i></a></li>
-    [%- IF ! identity AND dw_scheme.show_invite_link -%]<li><a href='[% site.root %]/manage/circle/invite' title="[% 'sitescheme.accountlinks.invitefriend' | ml %]" class="red"><i class="icon-heart"></i></a></li>[%- END -%]
+    [%# IF ! identity AND dw_scheme.show_invite_link %]
+    [%- IF ! identity -%]<li><a href='[% site.root %]/manage/circle/invite' title="[% 'sitescheme.accountlinks.invitefriend' | ml %]" class="red"><i class="icon-heart"></i></a></li>[%- END -%]
     [%- -%]<li><a href='[% site.root %]/support/' title="[% 'sitescheme.accountlinks.help' | ml %]"><i class="icon-question-sign"></i></a></li>
     [%- -%]</div>
 [%- ELSE -%]
@@ -225,10 +226,18 @@ Base Grab! template
 <p>[% 'sitescheme.footer.info' | ml %]</p>
 [%- END -%]
 [%- BLOCK block.page -%]
-<!DOCTYPE html>
-<html lang="lv">
+<!doctype html>
+<html lang="lv" itemscope itemtype="http://schema.org/WebPage">
     [% PROCESS block.head %]
     <body [% sections.bodyopts %]>
+        <div id="fb-root"></div>
+        <script>(function(d, s, id) {
+        var js, fjs = d.getElementsByTagName(s)[0];
+        if (d.getElementById(id)) return;
+        js = d.createElement(s); js.id = id;
+        js.src = "//connect.facebook.net/en_US/all.js#xfbml=1";
+        fjs.parentNode.insertBefore(js, fjs);
+        }(document, 'script', 'facebook-jssdk'));</script>
         <div id="canvas">
             <div id="page">
                 <div id="masthead" role="navigation" class="cf">
@@ -255,12 +264,24 @@ Base Grab! template
                 </div>
                 <div class="cf"></div>
                 <footer role="contentinfo">
-                    <div class="wrap">[% PROCESS block.footer %]</div>
+                    <div class="wrap">
+                        [% PROCESS block.footer %]
+                        <div id="social">
+                            <div class="g-plusone" data-size="tall" data-annotation="none" data-href="http://www.grab.lv"></div>
+                            <div class="fb-like" data-href="http://www.grab.lv" data-send="false" data-layout="button_count" data-width="450" data-show-faces="false"></div>
+                        </div>
+                    </div>
                 </footer>
             </div>
         </div>
         [% dw_scheme.final_body_html %]
-
+        <script type="text/javascript">
+        (function() {
+            var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
+            po.src = 'https://apis.google.com/js/plusone.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
+        })();
+        </script>
         <div id="shim-alpha"> </div>
     </body>
 </html>

@@ -89,6 +89,8 @@
     $SUGGESTIONS_COMM = "dw_suggestions";
     $SUGGESTIONS_USER = "suggestions_bot";
 
+    $EMBED_MODULE_DOMAIN = "embed.grab.lv";
+
     # 404 page
     # Uncomment if you don't want the (dw-free) default, 404-error.bml
     # (Note: you need to provide your own 404-error-local.bml)
